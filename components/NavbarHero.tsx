@@ -203,7 +203,7 @@ export default function NavbarHero() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setOpen(!open)}
-              className="focus:outline-none text-gray-200"
+              className="focus:outline-none text-gray-300"
             >
               {open ? <X size={26} /> : <Menu size={26} />}
             </button>
@@ -272,7 +272,7 @@ export default function NavbarHero() {
                 Innovatives Immobilienmarketing
               </h2>
 
-              <p className="text-sm sm:text-lg text-white/90 mb-5 text-shadow-immo">
+              <p className="text-sm sm:text-lg text-white/90 mb-5 text-glow-immo">
                 Wir machen Ihre Immobilie erlebbar– mit Home Staging,
                 professioneller Fotografie, Drohnenaufnahmen und mehr.
               </p>

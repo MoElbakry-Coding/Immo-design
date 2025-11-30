@@ -151,3 +151,10 @@ html {
     0 2px 24px rgba(0,0,0,1),
     0 6px 32px rgba(0,0,0,1);
 }
+.text-glow-immo {
+  text-shadow:
+     0 0 8px rgb(191, 203, 245),
+    0 0 16px rgb(182, 218, 240),
+    0 2px 24px rgb(148, 154, 165),
+    0 6px 32px rgb(178, 214, 243);
+}

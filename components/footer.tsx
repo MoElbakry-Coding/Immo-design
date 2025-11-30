@@ -40,6 +40,7 @@ export default function Footer() {
     </nav>
 
     {/* Contact / Social */}
+    {false && (
     <div className="flex flex-col items-center md:items-end space-y-4">
       <div className="flex space-x-4">
         <Link
@@ -65,8 +66,9 @@ export default function Footer() {
         </Link>
       </div>
     </div>
+    )}
   </div>
-
+  
   {/* Bottom Bar */}
   <div className="relative z-10 text-center py-5 text-xs text-gray-500 border-t border-white/10">
     © {new Date().getFullYear()}{" "}
