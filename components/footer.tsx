@@ -35,6 +35,8 @@ export default function Footer() {
       <Link href="/services" className="hover:text-white transition-colors">Leistungen</Link>
       <Link href="/about" className="hover:text-white transition-colors">Über Uns</Link>
       <Link href="/contact" className="hover:text-white transition-colors">Kontakt</Link>
+      <Link href="/imprint" className="hover:text-white transition-colors">Impressum</Link>
+      <Link href="/dataprotection" className="hover:text-white transition-colors">Datenschutz</Link>
     </nav>
 
     {/* Contact / Social */}

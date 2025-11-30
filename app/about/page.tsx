@@ -135,24 +135,12 @@ export default function UnternehmenFullSplit() {
               Inhaber
             </p>
             <p className="text-gray-700 leading-relaxed text-lg">
-              Immobilien professionell zu vermarkten bedeutet mehr als nur Exposés und 
-              Besichtigungen. Mein Name ist Daniel Betros – seit 2012 entwickle ich 
-              innovative Präsentationskonzepte, die Immobilien sichtbar aufwerten und 
-              schneller zum Erfolg führen. <br />
+              Herzlich willkommen bei ImmoDesign e.U.! Mein Name ist Daniel Betros und ich vermittle seit mehr als 10Jahren Immobilien im Auftrag meiner Kunden. <br />
               <br />
-              Von Anfang an und bis heute bin ich stets auf der Suche nach neuen Wegen und 
-              Ideen um Immobilien noch wirkungsvoller zu präsentieren und erfolgreicher zu
-              vermarkten. Im Laufe der Jahre habe ich den Einsatz von Home Staging, 
-              Drohnenaufnahmen, 3D-Visualisierungen, virtuellem Staging und weiteren 
-              modernen Methoden auf die Anforderungen des Immobilienvertriebs optimiert. 
-              Heute freue ich mich, diese Fähigkeiten an meine Kundinnen und Kunden 
-              weiterzugeben.
+              Von Anfang an und bis heute bin ich stets sehr interessiert an neuen Wegen und Ideen um Immobilien noch wirkungsvoller zu präsentieren und erfolgreicher zu vermarkten gewesen. Im Laufe der Jahre habe ich den Einsatz von Home Staging, Drohnenaufnahmen, 3D-Visualisierungen, virtuellem Staging und vielen weiteren Methoden auf die Anforderungen des Immobilienvertriebs optimiert. Heute freue ich mich, diese Fähigkeiten an meine Kundinnen und Kunden weiterzugeben.
               <br />
               <br />
-              Jede Immobilie und jede Verkaufssituation ist einzigartig –
-              deshalb ist Zuhören die wichtigste aller Fähigkeiten. In einem
-              persönlichen Gespräch finden wir gemeinsam das richtige Konzept
-              für Ihre Immobilie und Ihre Bedürfnisse.
+              Jede Immobilie und jede Verkaufssituation ist einzigartig – deshalb ist Zuhören die wichtigste aller Fähigkeiten; In einem persönlichen Gespräch finden wir gemeinsam das richtige Konzept für Ihre Immobilie und Ihre Bedürfnisse.
             </p>
           </div>
         </motion.div>
