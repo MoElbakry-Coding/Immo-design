@@ -315,7 +315,7 @@ export default function NavbarHero() {
                         style={{
                           height: cardHeight ? `${cardHeight}px` : "auto",
                         }}
-                        className="bg-gray-800 border border-gray-200 rounded-2xl shadow-lg w-[90%] p-4 sm:p-6 text-left flex flex-col justify-between"
+                        className="bg-gray-800 border border-gray-200 rounded-2xl shadow-lg w-[95%] min-h-[150px] p-4 sm:p-6 text-left flex flex-col justify-between"
                       >
                           <div className="flex items-center gap-4 mb-3">
                             <Image
