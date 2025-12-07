@@ -78,7 +78,7 @@ export default function NavbarHero() {
         "2019 wollten wir unser Haus verkaufen und haben Daniel kennengelerntin - inzwischen haben wir schon die dritte Immobilie mit seiner Hilfe veräußert, Danke!!",
       position: "",
       avatar: "/Elvira&Kemal_Alikovic.jpeg",
-      rating: 4,
+      rating: 5,
     },
     {
       id: 3,
@@ -272,7 +272,7 @@ export default function NavbarHero() {
                 Innovatives Immobilienmarketing
               </h2>
 
-              <p className="text-sm sm:text-lg text-white/90 mb-5 text-glow-immo">
+              <p className="text-sm sm:text-lg font-bold text-white/90 mb-5 text-glow-immo">
                 Wir machen Ihre Immobilie erlebbar– mit Home Staging,
                 professioneller Fotografie, Drohnenaufnahmen und mehr.
               </p>
