@@ -272,9 +272,8 @@ export default function NavbarHero() {
                 Innovatives Immobilienmarketing
               </h2>
 
-              <p className="text-base sm:text-xl font-bold text-white/90 mb-5 text-glow-immo">
-                Wir machen Ihre Immobilie erlebbar– mit Home Staging,
-                professioneller Fotografie, Drohnenaufnahmen und mehr.
+              <p className="text-base sm:text-xl font-bold text-white/90 mb-5 text-shadow-immo">
+                Wir machen Ihre Immobilie erlebbar– mit Home Staging, professioneller Fotografie, Drohnenaufnahmen und vielem mehr zur optimalen Vermarktung.
               </p>
 
               <Link

@@ -102,8 +102,7 @@ export default function UnternehmenFullSplit() {
           <div className="max-w-lg space-y-6">
             <p><strong>Datenschutzerklärung</strong></p>
             <p>
-              Der Schutz Ihrer persönlichen Daten ist uns ein großes Anliegen. Wir
-              verarbeiten Ihre Daten daher ausschließlich auf Grundlage der DSGVO…
+              Der Schutz Ihrer persönlichen Daten ist uns ein besonderes Anliegen. Wir verarbeiten Ihre Daten daher ausschließlich auf Grundlage der gesetzlichen Bestimmungen (DSG 2018, DSGVO, TKG 2003). In diesen Datenschutzinformationen informieren wir Sie über die wichtigsten Aspekte der Datenverarbeitung im Rahmen unserer Website.
             </p>
 
             <p><u>1. Verantwortlicher</u></p>
