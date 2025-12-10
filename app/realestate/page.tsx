@@ -198,7 +198,7 @@ export default function RealEstatePage() {
 
       {/* Property Type */}
       <div className="mb-6 bg-white shadow-2xl rounded-3xl p-6 border border-gray-200">
-        <p className="font-semibold mb-2 text-gray-600">Property Type</p>
+        <p className="font-semibold mb-2 text-gray-600">Immobilientyp</p>
         <div className="flex flex-col gap-2">
           {typeOptions.map((t) => (
             <label key={t} className="inline-flex items-center gap-2 cursor-pointer text-gray-700">
@@ -220,7 +220,7 @@ export default function RealEstatePage() {
 
       {/* Ground Area */}
       <div className="mb-6 bg-white shadow-2xl rounded-3xl p-6 border border-gray-200">
-        <p className="font-semibold mb-2 text-gray-600">Ground Area</p>
+        <p className="font-semibold mb-2 text-gray-600">Grundfläche</p>
         <select
           value={groundFilter ? groundFilter.join("-") : ""}
           onChange={(e) => {
@@ -229,7 +229,7 @@ export default function RealEstatePage() {
           }}
           className="border rounded px-4 py-2 cursor-pointer w-full"
         >
-          <option value="">All Ground Areas</option>
+          <option value="">alles anzeigen</option>
           {groundOptions.map(([label, range]) => (
             <option key={label} value={range.join("-")}>
               {label}
@@ -240,7 +240,7 @@ export default function RealEstatePage() {
 
       {/* House Area */}
       <div className="mb-6 bg-white shadow-2xl rounded-3xl p-6 border border-gray-200">
-        <p className="font-semibold mb-2 text-gray-600">House Area</p>
+        <p className="font-semibold mb-2 text-gray-600">Wohnfläche</p>
         <select
           value={houseFilter ? houseFilter.join("-") : ""}
           onChange={(e) => {
@@ -249,7 +249,7 @@ export default function RealEstatePage() {
           }}
           className="border rounded px-4 py-2 cursor-pointer w-full"
         >
-          <option value="">All House Areas</option>
+          <option value="">alles anzeigen</option>
           {houseOptions.map(([label, range]) => (
             <option key={label} value={range.join("-")}>
               {label}
@@ -262,7 +262,7 @@ export default function RealEstatePage() {
         onClick={clearFilters}
         className="mt-4 w-full px-4 py-2 rounded-xl border bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold transition cursor-pointer"
       >
-        Reset Filters
+        Filter zurücksetzen
       </button>
     </div>
   );
