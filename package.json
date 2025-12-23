@@ -1,5 +1,5 @@
 {
-  "name": "football-live",
+  "name": "idesign-immo",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -38,7 +38,7 @@
     "next": "15.5.7",
     "next-auth": "^4.24.11",
     "next-themes": "^0.4.6",
-    "nodemailer": "^6.10.1",
+    "nodemailer": "^7.0.12",
     "npm": "^11.6.1",
     "number-to-words": "^1.2.4",
     "ogl": "^1.0.11",

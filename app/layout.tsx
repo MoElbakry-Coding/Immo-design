@@ -5,7 +5,7 @@ import Footer from "../components/footer";
 import BackToTop from "../components/BackToTop";
 
 export const metadata: Metadata = {
-  title: "IDesign Immobilien – Luxury Real Estate | Exklusive Immobilien",
+  title: "IDesign Immobilien",
   description:
     "Discover luxury real estate with IDesign Immobilien. Exclusive properties, tailored investments, and visionary concepts with style. | Entdecken Sie exklusive Immobilien mit IDesign Immobilien. Luxusobjekte, maßgeschneiderte Investments und visionäre Konzepte mit Stil.",
   icons: {
