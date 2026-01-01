@@ -17,6 +17,23 @@ import Link from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
 import Image from "@tiptap/extension-image";
 
+// ---------------- DnD-kit ----------------
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+// ---------------- Types ----------------
 type FormFields = {
   title: string;
   description: string;
@@ -31,6 +48,37 @@ type FormFields = {
 
 type NewImage = { id: string; type: "new"; file: File; position: number };
 
+// ---------------- Sortable Image ----------------
+function SortableImage({
+  img,
+  children,
+}: {
+  img: NewImage;
+  children: React.ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: img.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="border rounded-lg p-3 bg-gray-50 flex flex-col gap-2 cursor-grab active:cursor-grabbing"
+    >
+      {children}
+    </div>
+  );
+}
+
+// ---------------- Main Component ----------------
 export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: () => void }) {
   const [form, setForm] = useState<FormFields>({
     title: "",
@@ -48,9 +96,8 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
-  // ---------------- TipTap editor ----------------
+  // ---------------- TipTap Editor ----------------
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -61,20 +108,18 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
     ],
     content: form.description,
     immediatelyRender: true,
-    onUpdate: ({ editor }) => setForm((prev) => ({ ...prev, description: editor.getHTML() })),
+    onUpdate: ({ editor }) => setForm(prev => ({ ...prev, description: editor.getHTML() })),
   });
 
   // ---------------- Helpers ----------------
   const normalize = (items: NewImage[]) =>
-    [...items].sort((a, b) => a.position - b.position).map((img, i) => ({ ...img, position: i + 1 }));
+    [...items].map((img, i) => ({ ...img, position: i + 1 }));
 
-  // ---------------- Input Change ----------------
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const key = e.target.name as keyof FormFields;
     setForm({ ...form, [key]: e.target.value });
   };
 
-  // ---------------- File Handling ----------------
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
@@ -84,7 +129,7 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
         ...prev,
         ...Array.from(files).map((file, i) => ({
           id: crypto.randomUUID(),
-          type: "new" as const,
+          type: "new" as const, // ✅ Type-safe
           file,
           position: prev.length + i + 1,
         })),
@@ -100,36 +145,33 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
 
   const setAsCover = (id: string) => {
     setDraftImages(prev =>
-      normalize(prev.map(img => (img.id === id ? { ...img, position: 1 } : { ...img, position: img.position + 1 })))
+      normalize(prev.map(img => (img.id === id ? { ...img, position: 1 } : img)))
     );
   };
 
-  const updatePosition = (id: string, newPos: number) => {
-    setDraftImages(prev => normalize(prev.map(img => (img.id === id ? { ...img, position: newPos } : img))));
+  // ---------------- DnD Kit Setup ----------------
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setDraftImages(items => {
+      const oldIndex = items.findIndex(i => i.id === active.id);
+      const newIndex = items.findIndex(i => i.id === over.id);
+      const newItems = arrayMove(items, oldIndex, newIndex);
+      return normalize(newItems);
+    });
   };
-
-  // ---------------- Drag & Drop ----------------
-  const handleDragStart = (index: number) => setDraggingIndex(index);
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-    e.preventDefault();
-    if (draggingIndex === null || draggingIndex === index) return;
-    const temp = [...draftImages];
-    const [moved] = temp.splice(draggingIndex, 1);
-    temp.splice(index, 0, moved);
-    setDraftImages(normalize(temp));
-    setDraggingIndex(index);
-  };
-
-  const handleDragEnd = () => setDraggingIndex(null);
 
   // ---------------- Submit ----------------
   const handleSubmit = async () => {
     if (draftImages.length === 0) return alert("Please add at least one image");
     setIsUploading(true);
-
-    const imageUrls: string[] = [];
     let uploaded = 0;
+    const imagesToSave: { url: string; position: number }[] = [];
 
     try {
       for (const img of draftImages) {
@@ -138,7 +180,7 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
         const { error } = await supabase.storage.from("properties").upload(filePath, file);
         if (error) { alert(`Failed to upload ${file.name}`); continue; }
         const { data } = supabase.storage.from("properties").getPublicUrl(filePath);
-        imageUrls.push(data.publicUrl);
+        imagesToSave.push({ url: data.publicUrl, position: img.position });
         uploaded++;
         setUploadProgress(Math.round((uploaded / draftImages.length) * 100));
       }
@@ -149,7 +191,7 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
         rooms: Number(form.rooms),
         ground_area: Number(form.ground_area),
         house_area: Number(form.house_area),
-        images: imageUrls,
+        images: imagesToSave.sort((a, b) => a.position - b.position),
       }]);
 
       if (error) alert("Failed to add property: " + error.message);
@@ -162,8 +204,12 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
         setDraftImages([]);
         editor?.commands.clearContent();
       }
-    } catch (err) { alert("Unexpected error"); console.error(err); }
-    finally { setIsUploading(false); setUploadProgress(0); }
+    } catch (err) {
+      alert("Unexpected error"); console.error(err);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
 
   // ---------------- UI ----------------
@@ -193,11 +239,6 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
           {/* Rich Text Editor */}
           <div className="flex flex-col">
             <label className="block text-sm font-medium mb-1">Description</label>
-            <div className="flex flex-wrap gap-2 mb-2 border rounded p-2 bg-gray-50 overflow-x-auto">
-              <Button size="sm" type="button" onClick={() => editor?.chain().focus().toggleBold().run()} className={editor?.isActive("bold") ? "bg-blue-100" : ""}>B</Button>
-              <Button size="sm" type="button" onClick={() => editor?.chain().focus().toggleItalic().run()} className={editor?.isActive("italic") ? "bg-blue-100" : ""}><i>I</i></Button>
-              <Button size="sm" type="button" onClick={() => editor?.chain().focus().toggleUnderline().run()} className={editor?.isActive("underline") ? "bg-blue-100" : ""}>U</Button>
-            </div>
             <div className="border rounded p-2 min-h-[20vh] max-h-[30vh] overflow-y-auto">
               <EditorContent editor={editor} />
             </div>
@@ -207,38 +248,41 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
           <input type="file" multiple hidden ref={fileInputRef} onChange={handleFileSelect} />
           <Button type="button" onClick={() => fileInputRef.current?.click()} variant="outline">Browse Images</Button>
 
-          <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto mt-2 p-1">
-            {draftImages.map((img, index) => (
-              <div
-                key={img.id}
-                draggable
-                onDragStart={() => handleDragStart(index)}
-                onDragOver={(e) => handleDragOver(e, index)}
-                onDragEnd={handleDragEnd}
-                className="border rounded-lg p-3 bg-gray-50 flex flex-col gap-2 cursor-move"
-              >
-                <img src={URL.createObjectURL(img.file)} className="w-full h-48 object-cover rounded" />
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold">{img.position === 1 ? "Cover" : "Position"}</span>
-                  <input
-                    type="number"
-                    min={1}
-                    value={img.position}
-                    onChange={(e) => updatePosition(img.id, Number(e.target.value))}
-                    className="border rounded px-2 py-1 w-20"
-                  />
-                  {img.position !== 1 && (
-                    <button type="button" onClick={() => setAsCover(img.id)} className="text-xs text-blue-600">
-                      Set as cover
-                    </button>
-                  )}
-                  <button type="button" onClick={() => removeImage(img.id)} className="ml-auto text-red-500 text-sm">
-                    Remove
-                  </button>
-                </div>
+          {/* Drag & Drop Images */}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={draftImages.map(i => i.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto mt-2 p-1">
+                {draftImages.map((img, index) => {
+                  const src = URL.createObjectURL(img.file);
+                  return (
+                    <SortableImage key={img.id} img={img}>
+                      <img src={src} className="w-full h-48 object-cover rounded" />
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold">
+                          {index === 0 ? "Cover" : `Position ${index + 1}`}
+                        </span>
+                        {index !== 0 && (
+                          <button type="button" onClick={() => setAsCover(img.id)} className="text-xs text-blue-600">
+                            Set as cover
+                          </button>
+                        )}
+                        <button type="button" onClick={() => removeImage(img.id)} className="ml-auto text-red-500 text-sm">
+                          Remove
+                        </button>
+                      </div>
+                    </SortableImage>
+                  );
+                })}
               </div>
-            ))}
-          </div>
+            </SortableContext>
+          </DndContext>
 
           {/* Progress Bar */}
           {isUploading && (

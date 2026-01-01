@@ -17,10 +17,58 @@ import Link from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
 import Image from "@tiptap/extension-image";
 
+// ----------- @dnd-kit imports -----------
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+// ----------- Types -----------
 type ExistingImage = { id: string; type: "existing"; url: string; position: number };
 type NewImage = { id: string; type: "new"; file: File; position: number };
 type ImageItem = ExistingImage | NewImage;
 
+// ----------- Sortable Image Component -----------
+function SortableImage({
+  img,
+  children,
+}: {
+  img: ImageItem;
+  children: React.ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: img.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="border rounded-lg p-3 bg-gray-50 flex flex-col gap-2 cursor-grab active:cursor-grabbing"
+    >
+      {children}
+    </div>
+  );
+}
+
+// ----------- Main Component -----------
 export default function EditPropertyDialog({
   record,
   onRecordUpdated,
@@ -31,10 +79,10 @@ export default function EditPropertyDialog({
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(record);
   const [draftImages, setDraftImages] = useState<ImageItem[]>(
-    (record.images || []).map((url: string, i: number) => ({
+    (record.images || []).map((img: any, i: number) => ({
       id: crypto.randomUUID(),
       type: "existing" as const,
-      url,
+      url: typeof img === "string" ? img : img.url,
       position: i + 1,
     }))
   );
@@ -44,8 +92,9 @@ export default function EditPropertyDialog({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const normalize = (items: ImageItem[]) =>
-    [...items].sort((a, b) => a.position - b.position).map((img, i) => ({ ...img, position: i + 1 }));
+    [...items].map((img, i) => ({ ...img, position: i + 1 }));
 
+  // ----------- TipTap Editor -----------
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -59,7 +108,7 @@ export default function EditPropertyDialog({
     onUpdate: ({ editor }) => setForm((p: any) => ({ ...p, description: editor.getHTML() })),
   });
 
-  // ---------------- File handling ----------------
+  // ----------- File Handling -----------
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
@@ -86,64 +135,62 @@ export default function EditPropertyDialog({
 
   const setAsCover = (id: string) => {
     setDraftImages(prev =>
-      normalize(
-        prev.map(img =>
-          img.id === id
-            ? { ...img, position: 1 }
-            : { ...img, position: img.position + 1 }
-        )
-      )
+      normalize(prev.map(img =>
+        img.id === id
+          ? { ...img, position: 1 }
+          : { ...img }
+      ))
     );
   };
 
-  const updatePosition = (id: string, newPos: number) => {
-    setDraftImages(prev =>
-      normalize(prev.map(img => (img.id === id ? { ...img, position: newPos } : img)))
-    );
+  // ----------- Drag & Drop Setup -----------
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setDraftImages((items) => {
+      const oldIndex = items.findIndex((i) => i.id === active.id);
+      const newIndex = items.findIndex((i) => i.id === over.id);
+
+      const newItems = arrayMove(items, oldIndex, newIndex);
+
+      // Normalize positions after drag
+      return normalize(newItems);
+    });
   };
 
-  // ---------------- Drag & Drop ----------------
-  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
-
-  const handleDragStart = (index: number) => setDraggingIndex(index);
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-    e.preventDefault();
-    if (draggingIndex === null || draggingIndex === index) return;
-    const temp = [...draftImages];
-    const [moved] = temp.splice(draggingIndex, 1);
-    temp.splice(index, 0, moved);
-    setDraftImages(normalize(temp));
-    setDraggingIndex(index);
-  };
-
-  const handleDragEnd = () => setDraggingIndex(null);
-
-  // ---------------- Input change ----------------
+  // ----------- Input Change -----------
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ---------------- Submit ----------------
+  // ----------- Submit -----------
   const handleSubmit = async () => {
     setIsUploading(true);
     try {
-      const imageUrls: string[] = [];
+      const imageObjects: { url: string; position: number }[] = [];
 
       for (const img of draftImages) {
-        if (img.type === "existing") imageUrls.push(img.url);
+        if (img.type === "existing") imageObjects.push({ url: img.url, position: img.position });
         else if (img.type === "new" && newFiles) {
           const file = img.file;
           const path = `properties/${Date.now()}-${file.name}`;
           await supabase.storage.from("properties").upload(path, file);
           const { data } = supabase.storage.from("properties").getPublicUrl(path);
-          imageUrls.push(data.publicUrl);
+          imageObjects.push({ url: data.publicUrl, position: img.position });
         }
       }
 
+      // Sort by position before saving
+      const sortedImages = imageObjects.sort((a, b) => a.position - b.position);
+
       await supabase
         .from("properties")
-        .update({ ...form, images: imageUrls })
+        .update({ ...form, images: sortedImages })
         .eq("id", form.id);
 
       onRecordUpdated();
@@ -192,41 +239,42 @@ export default function EditPropertyDialog({
             Browse Images
           </Button>
 
-          <div className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto mt-2 p-1">
-            {draftImages.map((img, index) => {
-              const src = img.type === "existing" ? img.url : URL.createObjectURL(img.file);
-              return (
-                <div
-                  key={img.id}
-                  draggable
-                  onDragStart={() => handleDragStart(index)}
-                  onDragOver={(e) => handleDragOver(e, index)}
-                  onDragEnd={handleDragEnd}
-                  className="border rounded-lg p-3 bg-gray-50 flex flex-col gap-2 cursor-move"
-                >
-                  <img src={src} className="w-full h-48 object-cover rounded" />
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold">{img.position === 1 ? "Cover" : "Position"}</span>
-                    <input
-                      type="number"
-                      min={1}
-                      value={img.position}
-                      onChange={(e) => updatePosition(img.id, Number(e.target.value))}
-                      className="border rounded px-2 py-1 w-20"
-                    />
-                    {img.position !== 1 && (
-                      <button type="button" onClick={() => setAsCover(img.id)} className="text-xs text-blue-600">
-                        Set as cover
-                      </button>
-                    )}
-                    <button type="button" onClick={() => removeImage(img.id)} className="ml-auto text-red-500 text-sm">
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {/* ----------- Drag & Drop Images ----------- */}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={draftImages.map((i) => i.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto mt-2 p-1">
+                {draftImages.map((img, index) => {
+                  const src = img.type === "existing" ? img.url : URL.createObjectURL(img.file);
+
+                  return (
+                    <SortableImage key={img.id} img={img}>
+                      <img src={src} className="w-full h-48 object-cover rounded" />
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold">
+                          {index === 0 ? "Cover" : `Position ${index + 1}`}
+                        </span>
+                        {index !== 0 && (
+                          <button type="button" onClick={() => setAsCover(img.id)} className="text-xs text-blue-600">
+                            Set as cover
+                          </button>
+                        )}
+                        <button type="button" onClick={() => removeImage(img.id)} className="ml-auto text-red-500 text-sm">
+                          Remove
+                        </button>
+                      </div>
+                    </SortableImage>
+                  );
+                })}
+              </div>
+            </SortableContext>
+          </DndContext>
 
           <Button type="button" onClick={handleSubmit} disabled={isUploading} className="w-full mt-6 py-3 text-lg">
             {isUploading ? "Updating..." : "Update Property"}
