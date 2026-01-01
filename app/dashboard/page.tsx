@@ -155,7 +155,7 @@ export default function DashboardPage() {
                           "No image"
                         )}
                       </td>
-                      <td className="px-4 py-2 border flex flex-wrap gap-2">
+                      <td className="px-4 py-4 border flex flex-row gap-2">
                         <EditPropertyDialog
                           record={p}
                           onRecordUpdated={() => { }}
