@@ -317,7 +317,7 @@ export default function RealEstatePage() {
         )}
 
         {/* Property Cards */}
-        <div className="lg:w-3/4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 p-4">
+        <div className="items-stretch lg:w-3/4 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-8 p-4">
           {filtered.length === 0 ? (
             <div className="text-center text-gray-600 col-span-full mt-16">
               No properties found in {selectedCountry}.
@@ -325,7 +325,7 @@ export default function RealEstatePage() {
           ) : (
             filtered.map((p) => (
               <Link key={p.id} href={`/realestate/${p.id}`}>
-                <div className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+                <div className="h-full sm:w-50 md:w-50 lg:w-70 xl:w-100 P-5 rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
                   <div className="relative">
                     <img
                       src={p.images?.[0] || "/placeholder.jpg"}

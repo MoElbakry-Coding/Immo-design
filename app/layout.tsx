@@ -5,9 +5,9 @@ import Footer from "../components/footer";
 import BackToTop from "../components/BackToTop";
 
 export const metadata: Metadata = {
-  title: "Immo Design Austria - Immo-design.at",
+  title: "Innovative Immobilienvermittlung - Immo-design.at",
   description:
-    "Discover luxury real estate with IDesign Immobilien. Exclusive properties, tailored investments, and visionary concepts with style. | Entdecken Sie exklusive Immobilien mit IDesign Immobilien. Luxusobjekte, maßgeschneiderte Investments und visionäre Konzepte mit Stil.",
+    " Wir machen Ihre Immobilie erlebbar– mit Home Staging, professioneller Fotografie, Drohnenaufnahmen und vielem mehr zur optimalen Vermarktung.",
   icons: {
     icon: "./favicon.ico",
     shortcut: "./favicon.ico",
