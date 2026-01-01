@@ -338,7 +338,7 @@ export default function RealEstatePage() {
                     </div>
                   </div>
                   <div className="p-5">
-                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900 line-clamp-1">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900 line-clamp-5">
                       {p.title}
                     </h2>
                     <p className="flex items-center gap-1 text-gray-500 text-sm mt-1">
