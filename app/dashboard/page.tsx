@@ -97,17 +97,17 @@ export default function DashboardPage() {
     );
 
   return (
-    <div className="container mx-auto px-4 py-10 pt-2">
-      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+    <div className="container mx-auto px-4 py-10 pt-20">
+      <h1 className="text-2xl font-bold m-6">Dashboard</h1>
 
       <Tabs defaultValue="properties">
-        <TabsList className="flex justify-center mb-6 gap-4 pt-2">
+        <TabsList className="flex justify-center mb-6 gap-4 p-2">
           <TabsTrigger value="properties">Properties</TabsTrigger>
         </TabsList>
 
         <TabsContent value="properties">
           <div className="flex flex-wrap gap-4 mb-4 items-center">
-            <AddPropertyDialog onRecordAdded={() => {}} />
+            <AddPropertyDialog onRecordAdded={() => { }} />
           </div>
 
           {loading ? (
@@ -116,7 +116,7 @@ export default function DashboardPage() {
             <p>No properties found.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full bg-white shadow rounded-lg border">
+              <table className="min-w-full bg-white shadow rounded-lg border flex-row">
                 <thead className="bg-gray-100">
                   <tr>
                     <th className="px-4 py-2 border">Title</th>
@@ -158,7 +158,7 @@ export default function DashboardPage() {
                       <td className="px-4 py-2 border flex flex-wrap gap-2">
                         <EditPropertyDialog
                           record={p}
-                          onRecordUpdated={() => {}}
+                          onRecordUpdated={() => { }}
                         />
                         <Button
                           variant="destructive"
