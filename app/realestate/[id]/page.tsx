@@ -81,22 +81,22 @@ export default function PropertyDetails({ params }: Props) {
 
             <div className="space-y-3 text-gray-700">
               <p>
-                <span className="font-semibold text-gray-900">💰 Price:</span>{" "}
+                <span className="font-semibold text-gray-900">💰 Preis:</span>{" "}
                 <span className="text-blue-600 text-xl font-bold">
                   €{property.price.toLocaleString()}
                 </span>
               </p>
               <p>
-                <span className="font-semibold">🏡 Type:</span> {property.property_type}
+                <span className="font-semibold">🏡 Immobilientyp:</span> {property.property_type}
               </p>
               <p>
-                <span className="font-semibold">🛏️ Rooms:</span> {property.rooms}
+                <span className="font-semibold">🛏️ Zimmer:</span> {property.rooms}
               </p>
               <p>
-                <span className="font-semibold">🌳 Ground Area:</span> {property.ground_area} m²
+                <span className="font-semibold">🌳 Grundfläche:</span> {property.ground_area} m²
               </p>
               <p>
-                <span className="font-semibold">🏠 House Area:</span> {property.house_area} m²
+                <span className="font-semibold">🏠 Wohnfläche:</span> {property.house_area} m²
               </p>
             </div>
           </div>
