@@ -180,7 +180,7 @@ export default function PropertyDetails({ params }: Props) {
 
           {/* Description */}
           <div className="prose max-w-full">
-            <h2 className="text-2xl font-semibold mb-3 text-gray-800">Property Description</h2>
+            <h2 className="text-2xl font-semibold mb-3 text-gray-800">Beschreibung</h2>
             <div
               className="text-gray-700 leading-relaxed"
               dangerouslySetInnerHTML={{
