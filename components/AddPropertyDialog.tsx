@@ -44,6 +44,7 @@ type FormFields = {
   rooms: string;
   ground_area: string;
   house_area: string;
+  country: string;
 };
 
 type NewImage = { id: string; type: "new"; file: File; position: number };
@@ -90,12 +91,14 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
     rooms: "",
     ground_area: "",
     house_area: "",
+    country: "Austria",
   });
 
   const [draftImages, setDraftImages] = useState<NewImage[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   // ---------------- TipTap Editor ----------------
   const editor = useEditor({
@@ -191,7 +194,9 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
         rooms: Number(form.rooms),
         ground_area: Number(form.ground_area),
         house_area: Number(form.house_area),
-        images: imagesToSave.sort((a, b) => a.position - b.position),
+        images: imagesToSave
+          .sort((a, b) => a.position - b.position)
+          .map(img => img.url),
       }]);
 
       if (error) alert("Failed to add property: " + error.message);
@@ -199,7 +204,7 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
         onRecordAdded();
         setForm({
           title: "", description: "", price: "", location_city: "", location_address: "",
-          property_type: "", rooms: "", ground_area: "", house_area: "",
+          property_type: "", rooms: "", ground_area: "", house_area: "", country: "",
         });
         setDraftImages([]);
         editor?.commands.clearContent();
@@ -209,12 +214,15 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
+
+      setIsOpen(false);
+      window.location.reload();
     }
   };
 
   // ---------------- UI ----------------
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>Add Property</Button>
       </DialogTrigger>
@@ -224,17 +232,19 @@ export default function AddPropertyDialog({ onRecordAdded }: { onRecordAdded: ()
         </DialogHeader>
 
         <form className="space-y-3 flex flex-col">
-          {Object.keys(form).map((field) => (
-            <input
-              key={field}
-              name={field}
-              type={["price", "rooms", "ground_area", "house_area"].includes(field) ? "number" : "text"}
-              placeholder={field.replace("_", " ")}
-              value={form[field as keyof FormFields]}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            />
-          ))}
+          {Object.keys(form)
+            .filter(field => field !== "country")
+            .map((field) => (
+              <input
+                key={field}
+                name={field}
+                type={["price", "rooms", "ground_area", "house_area"].includes(field) ? "number" : "text"}
+                placeholder={field.replace("_", " ")}
+                value={form[field as keyof FormFields]}
+                onChange={handleChange}
+                className="w-full border p-2 rounded"
+              />
+            ))}
 
           {/* Rich Text Editor */}
           <div className="flex flex-col">
